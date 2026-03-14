@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MoodTracker.API/MoodTracker.API.csproj" />
+    <Project Path="src/MoodTracker.Application/MoodTracker.Application.csproj" />
+    <Project Path="src/MoodTracker.Contracts/MoodTracker.Contracts.csproj" />
+    <Project Path="src/MoodTracker.Domain/MoodTracker.Domain.csproj" />
+    <Project Path="src/MoodTracker.Infrastructure/MoodTracker.Infrastructure.csproj" />
+  </Folder>
+</Solution>
