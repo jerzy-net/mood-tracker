@@ -11,7 +11,7 @@ public sealed class CreateMoodEntryValidator : AbstractValidator<CreateMoodEntry
 
         RuleFor(command => command.RecordedAtUtc)
             .Must(IsUtcOrUnspecified)
-            .WithMessage("RecordedAtUtc must be in UTC.");
+            .WithMessage("RecordedAtUtc must be in UTC or have an unspecified kind (treated as UTC).");
 
         RuleFor(command => command.UserId)
             .Must(id => !id.HasValue || id != Guid.Empty)
