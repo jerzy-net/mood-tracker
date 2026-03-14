@@ -11,8 +11,8 @@ This document outlines the proposed backend solution structure for MoodTracker. 
 - `src/MoodTracker.Infrastructure/`
 - `src/MoodTracker.Contracts/`
 - `src/MoodTracker.API/`
-- `docker-compose.yml` — API + PostgreSQL
-- `backend/Dockerfile` — ASP.NET Core runtime image for the API
+- `/docker-compose.yml` — API + PostgreSQL
+- `/docker/backend.Dockerfile` — ASP.NET Core runtime image for the API
 
 ## Projects and Files
 
@@ -23,7 +23,6 @@ This document outlines the proposed backend solution structure for MoodTracker. 
 - `ValueObjects/MoodScore.cs` — enforces allowed range [-5, +5]
 - `ValueObjects/RecordedAt.cs` — UTC-only timestamp value object
 - `Abstractions/AuditableEntity.cs` — created/updated timestamps
-- `Events/MoodEntryCreated.cs` — domain event raised on creation
 
 ### MoodTracker.Application
 - `MoodTracker.Application.csproj` — class library definition
@@ -64,12 +63,12 @@ This document outlines the proposed backend solution structure for MoodTracker. 
 
 ### MoodTracker.API
 - `MoodTracker.API.csproj` — ASP.NET Core web project
-- `Program.cs` — composition root: configuration for Swagger, Serilog, EF Core, HealthChecks, CORS, API versioning (`/api/v1`), and middleware pipeline
+- `Program.cs` — composition root: configuration for Swagger, Serilog, EF Core, HealthChecks (exposed with `app.MapHealthChecks("/health")`), CORS, API versioning (`/api/v1`), and middleware pipeline
 - `Controllers/MoodsController.cs` — endpoints for create + history using Contracts DTOs
 - `Controllers/HealthController.cs` — `/health` endpoint wired to HealthChecks
 - `Middleware/ExceptionHandlingMiddleware.cs` — global error handling + problem details
 - `Filters/ValidationFilter.cs` — translates validation failures to consistent responses
-- `Extensions/ServiceCollectionExtensions.cs` — API-layer setup helpers (Swagger, CORS policy)
+- `Extensions/ServiceCollectionExtensions.cs` — API-layer setup helpers (Swagger, CORS policy via `API.Extensions`)
 - `appsettings.json` — base config including PostgreSQL connection string placeholder and Serilog sinks
 - `appsettings.Development.json` — development overrides
 - `Properties/launchSettings.json` — local profiles
@@ -78,13 +77,13 @@ This document outlines the proposed backend solution structure for MoodTracker. 
 - **EF Core + PostgreSQL:** `MoodTrackerDbContext` configured with Npgsql provider; migrations live in Infrastructure. Connection string pulled from configuration and exposed via `appsettings*.json` and `docker-compose.yml`.
 - **Serilog:** Configured in Infrastructure for console output and request logging; bootstrap logging enabled in `Program.cs`.
 - **Swagger/OpenAPI:** Enabled in API via Swashbuckle; grouped under `v1` with docs at `/swagger`.
-- **HealthChecks:** Registered with Npgsql check for database connectivity; exposed at `/health`.
-- **CORS:** Single policy allowing configured frontend origin(s); registered in Infrastructure and applied in API.
+- **HealthChecks:** Registered with Npgsql check for database connectivity; exposed at `/health` via `app.MapHealthChecks("/health")`.
+- **CORS:** Single policy allowing configured frontend origin(s); registered in Infrastructure and applied in API via `API.Extensions` helper.
 - **Global Error Middleware:** `ExceptionHandlingMiddleware` wraps the pipeline to produce ProblemDetails responses and map known exceptions (e.g., duplicates) to proper status codes.
-- **API Versioning:** Route template `/api/v1/...` applied to controllers; Swagger doc matches version.
-- **Docker:** `backend/Dockerfile` builds the API; `docker-compose.yml` runs API + PostgreSQL (with exposed port, volume, and healthcheck).
+- **API Versioning:** Route template `/api/v1/...` applied to controllers using `Asp.Versioning.Mvc`; Swagger doc matches version.
+- **Docker:** `/docker/backend.Dockerfile` builds the API; `/docker-compose.yml` runs API + PostgreSQL (with exposed port, volume, and healthcheck).
 
-## Open Questions
-- Preferred database name, user, and password for the PostgreSQL container
-- Allowed CORS origins for the frontend
-- Desired Serilog sinks beyond console (e.g., Seq, file)
+## Decisions
+- Database defaults: name `MoodTracker`, user `admin`, password `admin`.
+- CORS: allow `http://localhost:5173` (Vite dev). Make origins configurable via `appsettings.json` under `Cors:AllowedOrigins`.
+- Serilog sinks: console by default, add file sink for local debugging if needed (configurable).
