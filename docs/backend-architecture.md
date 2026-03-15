@@ -3,16 +3,16 @@
 This document outlines the proposed backend solution structure for MoodTracker. It follows Clean Architecture and prepares infrastructure for EF Core with PostgreSQL, Serilog, Swagger, HealthChecks, CORS, and a global error middleware. Authentication is intentionally deferred.
 
 ## Solution Layout
-- `MoodTracker.sln` — solution root referencing all projects
-- `src/Directory.Build.props` — shared settings (nullable, implicit usings, treat warnings as errors)
-- `src/Directory.Packages.props` — centralized NuGet versions (ASP.NET Core, EF Core, MediatR, FluentValidation, Serilog)
-- `src/MoodTracker.Domain/`
-- `src/MoodTracker.Application/`
-- `src/MoodTracker.Infrastructure/`
-- `src/MoodTracker.Contracts/`
-- `src/MoodTracker.API/`
+- `backend/MoodTracker.slnx` — solution root referencing all projects
+- `backend/src/Directory.Build.props` — shared settings (nullable, implicit usings, treat warnings as errors)
+- `backend/src/Directory.Packages.props` — centralized NuGet versions (ASP.NET Core, EF Core, MediatR, FluentValidation, Serilog)
+- `backend/src/MoodTracker.Domain/`
+- `backend/src/MoodTracker.Application/`
+- `backend/src/MoodTracker.Infrastructure/`
+- `backend/src/MoodTracker.Contracts/`
+- `backend/src/MoodTracker.API/`
 - `/docker-compose.yml` — API + PostgreSQL
-- `/docker/backend.Dockerfile` — ASP.NET Core runtime image for the API
+- `/backend/docker/backend.Dockerfile` — ASP.NET Core runtime image for the API
 
 ## Projects and Files
 
@@ -81,7 +81,7 @@ This document outlines the proposed backend solution structure for MoodTracker. 
 - **CORS:** Single policy allowing configured frontend origin(s); registered in Infrastructure and applied in API via `API.Extensions` helper.
 - **Global Error Middleware:** `ExceptionHandlingMiddleware` wraps the pipeline to produce ProblemDetails responses and map known exceptions (e.g., duplicates) to proper status codes.
 - **API Versioning:** Route template `/api/v1/...` applied to controllers using `Asp.Versioning.Mvc`; Swagger doc matches version.
-- **Docker:** `/docker/backend.Dockerfile` builds the API; `/docker-compose.yml` runs API + PostgreSQL (with exposed port, volume, and healthcheck).
+- **Docker:** `/backend/docker/backend.Dockerfile` builds the API; `/docker-compose.yml` runs API + PostgreSQL (with exposed port, volume, and healthcheck).
 
 ## Decisions
 - Database defaults: name `MoodTracker`, user `admin`, password `admin`.

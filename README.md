@@ -12,6 +12,12 @@ The project demonstrates clean architecture, testability, proper layering, conta
 
 ---
 
+## Repository Layout
+- `backend/` — .NET solution and Docker assets
+- `frontend/` — placeholder for the future React app
+
+---
+
 ## Tech Stack
 
 ### Backend
@@ -98,7 +104,7 @@ Services:
 
 Run backend tests:
 
-dotnet test
+dotnet test backend/MoodTracker.slnx
 
 Unit tests cover:
 - User registration
